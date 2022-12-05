@@ -6,7 +6,7 @@ fn main() {
   println!("December 03 / 1");
 
   let mut total_score = 0;
-  if let Ok(lines) = read_lines("./input.txt") { // 
+  if let Ok(lines) = read_lines("./test_input_part1.txt") { // 
     for line in lines {
       if let Ok(strat_str) = line {
         // Split string in half
@@ -14,30 +14,30 @@ fn main() {
         let len = strat_str.chars().count();  
         let (lcompart, rcompart) = strat_str.split_at(len/2);
 
-        println!("{} => {}", lcompart, rcompart);
-
-        // Find the common parts in the lcompart / rcompart
-        // Iterate thru lcompart char by char and see if rcompart has it
-        // This code will find multiple instances. 
-        let shared_chars: Vec<char> = lcompart.chars()
-          .filter(|&ch| { rcompart.contains(ch) })
-          .collect();
-
-        static LCASE: &str = "abcdefghijklmnopqrstuvwxyz";
-        static UCASE: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        let priority;
-        if shared_chars[0].is_uppercase() {
-          priority = UCASE.chars().position(|c| c == shared_chars[0]).unwrap() + 27;
-        } else {
-          priority = LCASE.chars().position(|c| c == shared_chars[0]).unwrap() + 1;
-        }
-
-        total_score += priority;
+        let shared_char = find_shared_char(lcompart, rcompart);
+        total_score += priority_for_char(shared_char);
       }
     }
     println!("Total priority is {}", total_score);
   }
+}
+
+fn find_shared_char(s1: String, s2: String) -> char {
+  println!("{} => {}", s1, s2);
+
+  // Find the common parts in the lcompart / rcompart
+  // Iterate thru lcompart char by char and see if rcompart has it
+  // This code will find multiple instances. 
+  return s1
+    .chars()
+    .filter(|&ch| { s2.contains(ch) })
+    .collect()
+    .first();
+}
+
+fn priority_for_char(ch: char) -> usize {
+  static ALPHABET: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return ALPHABET.chars().position(|c| c == ch).unwrap() + 1;
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
