@@ -1,3 +1,11 @@
 [package]
 name = "AOC22_3"
 version = "0.0.1"  
+
+[[bin]]
+name = "main-part1"
+path = "src/main-part1.rs"
+
+[[bin]]
+name = "main-part2"
+path = "src/main-part2.rs"
