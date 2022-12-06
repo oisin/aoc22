@@ -1,8 +1,3 @@
-//Change the approach here for  this one and put more structure
-// into the picture. Move to the input_str used by other people and
-// away from the file reader based approach
-// put in tests and run it from cargo
-// have a single binary as well that will do part1 and part2 as separate functions
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
