@@ -9,18 +9,41 @@ fn main() {
     // Read until a blank line is reached
 
     let mut stack_data: Vec<String> = Vec::new();
-    if let Ok(lines) = read_lines("./test_input_part1.txt") {
+    let mut move_data: Vec<Vec<usize>> = Vec::new();
+    let mut stacks: Vec<Vec<char>> = Vec::new();
+
+    if let Ok(lines) = read_lines("./input.txt") {
+        let mut stack_collecting = true;
+
         for line in lines {
-            if let Ok(stack) = line {
-                if stack.is_empty() {
-                    break;
+            if let Ok(instruction) = line {
+                println!("Pushing instruction: {}", instruction);
+                if stack_collecting {
+                    if instruction.is_empty() {
+                        // Switch mode from stack description to move instructions processing
+                        stack_collecting = false;
+                    } else {
+                        stack_data.push(instruction);
+                    }
+                } else {
+                    // now the moves can begin - read the moves from the input file
+                    //    move 1 from 2 to 1
+                    // split on space -> [move, 1, from, 2, to, 1]
+                    // relevant instructions are on inx [1,3,5]
+                    // convert to usize
+                    // : number to pop
+                    // : index of the source vector + 1
+                    // : index of the target vector + 1
+                    let splitvec: Vec<usize> = instruction
+                        .split(' ')
+                        .filter_map(|s| s.parse().ok())
+                        .collect();
+                    move_data.push(splitvec);
                 }
-                stack_data.push(stack);
             }
         }
-        println!(" stack looks like {:?}", stack_data);
 
-        // The number at the base of the stack pinpoints the column where the 
+        // The number at the base of the stack pinpoints the column where the
         // crate identifier is. Follow the columns to create vectors for each
         // stack of crates.
 
@@ -30,31 +53,25 @@ fn main() {
             .enumerate()
             .map(|(i, c)| {
                 if !c.is_whitespace() {
-                   return i;
+                    return i;
                 }
                 return 0;
             })
             .filter(|&i| i != 0)
             .collect();
 
-        //println!("indexes are {:?}", boop);
-
         // boop is a vector containing the columns we need to check to pull
-        // out the crate labels from the right place in the loaded strings 
+        // out the crate labels from the right place in the loaded strings
         // to create the vectors.
         //
         // In the test data, the columns are [1,5,9]. Three stacks then, in
-        // a vector themselves, in order. 
+        // a vector themselves, in order.
 
         println!("{} columns: {:?}", boop.len(), boop);
-
-        let mut stacks: Vec<Vec<char>> = Vec::new();
 
         for _ in 1..=boop.len() {
             stacks.push(Vec::new());
         }
-
-        println!("stacks vec: {:?}", stacks);
 
         let mut extract_keys = true;
         for stackline in stack_data.iter().rev() {
@@ -71,19 +88,23 @@ fn main() {
         }
 
         // from the test data, the above will make:  [['Z', 'N'], ['M', 'C', 'D'], ['P']]
-        // now the moves can begin - read the moves from the input file
-        //    move 1 from 2 to 1
-        // split on space -> [move, 1, from, 2, to, 1]
-        // relevant instructions are on inx [1,3,5]
-        // convert to usize
-        // : number to pop 
-        // : index of the source vector + 1
-        // : index of the target vector + 1
-
-        
-
-        println!("hash loks like: {:?}", stacks)
+        println!(" stacks looks like {:?}", stacks);
     }
+
+    // At last we can now do the processing sigh
+    for mov in move_data {
+        for _ in 1..=mov[0] {
+            let el = stacks[mov[1] - 1]
+                .pop()
+                .expect("Did not expect empty stack pop instruction");
+            stacks[mov[2] - 1].push(el);
+        }
+        println!(" stacks looks like {:?}", stacks);
+    }
+
+    let result: String = stacks.iter().map(|s| s.last().unwrap()).collect();
+
+    println!("result: {:?}", result);
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
