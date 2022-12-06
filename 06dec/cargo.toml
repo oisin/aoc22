@@ -1,0 +1,7 @@
+[package]
+name = "AOC22_6"
+version = "0.0.1"  
+
+[[bin]]
+name = "main-part1"
+path = "src/main-part1.rs"
